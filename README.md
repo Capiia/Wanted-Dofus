@@ -4,13 +4,15 @@ Tracker d'avis de recherche pour Dofus. Inspire par [Ganymede](https://ganymede-
 
 - Suivi des 82 recherches par milice
 - OCR automatique via screenshot
-- Always-on-top, transparence reglable
+- Always-on-top (reste par-dessus Dofus)
+- Transparence reglable
 - Sauvegarde locale persistante
-- Mise a jour automatique
 
 ## Installation
 
-Telecharge `Wanted_Setup.exe` depuis les [Releases](../../releases/latest) et lance-le.
+1. Telecharge `Wanted-v1.1.0-win.zip` depuis les [Releases](../../releases/latest)
+2. Decompresse le zip ou tu veux
+3. Lance `Wanted.exe`
 
 ## Utilisation
 
@@ -22,12 +24,13 @@ Telecharge `Wanted_Setup.exe` depuis les [Releases](../../releases/latest) et la
 
 Pour ajouter tes quetes en cours ou terminees sans tout cocher a la main :
 
-1. Dans Dofus, ouvre ton **journal de quetes**
-2. Va dans l'onglet **En cours** pour les quetes prises, ou **Terminees** pour les quetes finies
-3. Fais **Win+Shift+S** et selectionne la zone avec les noms "On recherche..."
-4. Reviens sur Wanted et fais **Ctrl+V**
-5. Choisis le mode avant : **Scan En cours** (marque comme pris) ou **Scan Faits** (marque comme fait)
+1. Dans Wanted, clique **Scan En cours** ou **Scan Faits** selon ce que tu veux scanner
+2. Dans Dofus, ouvre ton **journal de quetes**
+3. Va dans l'onglet **En cours** pour les quetes prises, ou **Terminees** pour les quetes finies
+4. Fais **Win+Shift+S** et selectionne la zone avec les noms "On recherche..."
+5. Reviens sur Wanted et fais **Ctrl+V**
 
+L'OCR detecte automatiquement les noms des recherches et les marque dans l'app.
 Tu peux faire plusieurs screenshots si ta liste ne tient pas en un seul ecran.
 
 ## Credits
