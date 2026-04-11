@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Wanted</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #0c0c0f;
+      --bg-surface: #141418;
+      --bg-raised: #1c1c22;
+      --bg-hover: #24242c;
+      --bg-active: #2c2c36;
+      --accent: #d4a057;
+      --accent-dim: rgba(212,160,87,0.12);
+      --success: #5cb85c;
+      --success-dim: rgba(92,184,92,0.12);
+      --info: #5b9fd6;
+      --info-dim: rgba(91,159,214,0.12);
+      --warn: #c77dba;
+      --warn-dim: rgba(199,125,186,0.12);
+      --danger: #d45d5d;
+      --danger-dim: rgba(212,93,93,0.12);
+      --text: #d8d8dd;
+      --text-secondary: #8e8e96;
+      --text-muted: #555560;
+      --border: #2a2a32;
+      --border-light: #1f1f28;
+      --radius: 6px;
+      --radius-sm: 4px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background: var(--bg-base);
+      color: var(--text);
+      font-size: 12px;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ─── TITLEBAR ─── */
+    .titlebar {
+      display: flex; align-items: center; height: 28px;
+      background: var(--bg-base); padding: 0 6px;
+      -webkit-app-region: drag; flex-shrink: 0;
+    }
+    .titlebar-title {
+      font-size: 10px; font-weight: 700; color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+    .titlebar-btns {
+      display: flex; margin-left: auto; -webkit-app-region: no-drag;
+    }
+    .tb-btn {
+      width: 36px; height: 28px; background: none; border: none;
+      color: var(--text-muted); cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .tb-btn:hover { background: var(--bg-hover); color: var(--text); }
+    .tb-close:hover { background: #e81123; color: #fff; }
+
+    /* ─── HEADER ─── */
+    .header {
+      padding: 10px 14px 8px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .header-top {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+    }
+    .app-title {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--text-muted);
+    }
+    .header-inputs {
+      display: flex; gap: 5px; align-items: center; flex-wrap: wrap;
+      justify-content: center; width: 100%;
+    }
+    .input-pill {
+      display: flex; align-items: center; gap: 3px;
+      background: var(--bg-raised); border: 1px solid var(--border);
+      border-radius: 20px; padding: 3px 8px 3px 10px;
+    }
+    .input-pill label {
+      font-size: 10px; color: var(--text-muted); font-weight: 500;
+      white-space: nowrap;
+    }
+    .input-pill input[type="number"] {
+      width: 38px; background: none; border: none;
+      color: var(--accent); font-size: 11px; font-weight: 700;
+      text-align: center; font-family: inherit;
+      -moz-appearance: textfield;
+    }
+    .input-pill input[type="number"]::-webkit-inner-spin-button,
+    .input-pill input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+    .input-pill input[type="number"]:focus { outline: none; }
+    .input-pill.align input { color: var(--warn); }
+    .opacity-slider {
+      display: flex; align-items: center; gap: 4px;
+    }
+    .opacity-slider label { font-size: 9px; color: var(--text-muted); }
+    .opacity-slider input[type="range"] {
+      width: 44px; height: 3px; accent-color: var(--text-muted);
+    }
+
+    /* Progress */
+    .progress-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .progress-track {
+      flex: 1; height: 3px; background: var(--bg-raised);
+      border-radius: 2px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; background: var(--success);
+      border-radius: 2px; transition: width 0.3s;
+    }
+    .progress-label {
+      font-size: 10px; color: var(--text-muted); font-weight: 500;
+      white-space: nowrap;
+    }
+
+    /* ─── TABS ─── */
+    .tabs {
+      display: flex; background: var(--bg-surface);
+      border-bottom: 1px solid var(--border); flex-shrink: 0;
+    }
+    .tab {
+      flex: 1; padding: 9px 0; text-align: center; cursor: pointer;
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      border-bottom: 2px solid transparent; transition: all 0.15s;
+      letter-spacing: 0.3px;
+    }
+    .tab:hover { color: var(--text-secondary); }
+    .tab.active { color: var(--text); border-bottom-color: var(--accent); }
+    .tab .tab-count {
+      display: inline-block; min-width: 16px; padding: 0 4px;
+      border-radius: 8px; font-size: 9px; font-weight: 700;
+      margin-left: 4px; background: var(--accent-dim); color: var(--accent);
+    }
+
+    /* ─── TOOLBAR ─── */
+    .toolbar {
+      display: flex; gap: 6px; padding: 8px 14px;
+      background: var(--bg-surface); border-bottom: 1px solid var(--border);
+      flex-shrink: 0; align-items: center;
+    }
+    .search-input {
+      flex: 1; padding: 6px 10px; background: var(--bg-raised);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      color: var(--text); font-size: 11px; font-family: inherit;
+    }
+    .search-input:focus { outline: none; border-color: var(--accent); }
+    .search-input::placeholder { color: var(--text-muted); }
+    .filter-chip {
+      padding: 5px 10px; background: var(--bg-raised);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      color: var(--text-secondary); font-size: 10px; font-family: inherit;
+      cursor: pointer; font-weight: 500;
+    }
+    .filter-chip:focus { outline: none; border-color: var(--accent); }
+
+    /* ─── SCROLL CONTENT ─── */
+    .content {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+    }
+    .content::-webkit-scrollbar { width: 5px; }
+    .content::-webkit-scrollbar-track { background: transparent; }
+    .content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .content::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ─── SECTION HEADERS ─── */
+    .section-header {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 14px; background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-light);
+      position: sticky; top: 0; z-index: 2; cursor: pointer;
+    }
+    .section-header:hover { background: var(--bg-raised); }
+    .section-arrow {
+      font-size: 8px; color: var(--text-muted);
+      transition: transform 0.15s; width: 10px;
+    }
+    .section-header.collapsed .section-arrow { transform: rotate(-90deg); }
+    .section-title {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; flex: 1;
+    }
+    .section-count {
+      font-size: 9px; font-weight: 600; color: var(--text-muted);
+      background: var(--bg-active); padding: 1px 7px; border-radius: 8px;
+    }
+    .section-header.s-recup .section-title { color: var(--warn); }
+    .section-header.s-recup .section-count { background: var(--warn-dim); color: var(--warn); }
+    .section-header.s-pris .section-title { color: var(--accent); }
+    .section-header.s-pris .section-count { background: var(--accent-dim); color: var(--accent); }
+    .section-header.s-fait .section-title { color: var(--success); }
+    .section-header.s-fait .section-count { background: var(--success-dim); color: var(--success); }
+    .section-header.s-zone .section-title { color: var(--info); }
+    .section-header.s-zone .section-count { background: var(--info-dim); color: var(--info); }
+
+    /* ─── BOUNTY CARD ─── */
+    .bounty {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border-light);
+      transition: background 0.1s;
+    }
+    .bounty:hover { background: var(--bg-hover); }
+    .bounty.is-done { opacity: 0.3; }
+
+    .bounty-img {
+      width: 34px; height: 34px; border-radius: var(--radius-sm);
+      object-fit: contain; flex-shrink: 0;
+      background: var(--bg-raised);
+    }
+    .bounty-body { flex: 1; min-width: 0; }
+    .bounty-row1 {
+      display: flex; align-items: center; gap: 5px;
+    }
+    .bounty-name {
+      font-size: 12px; font-weight: 600; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      text-decoration: none; cursor: pointer;
+    }
+    .bounty-name:hover { color: var(--accent); }
+    .is-done .bounty-name { text-decoration: line-through; }
+    .pill {
+      display: inline-block; padding: 1px 5px; border-radius: 3px;
+      font-size: 8px; font-weight: 700; letter-spacing: 0.3px;
+      flex-shrink: 0;
+    }
+    .pill-align { background: var(--warn-dim); color: var(--warn); }
+    .pill-invuln { background: var(--danger-dim); color: var(--danger); }
+    .pill-reduc { background: var(--info-dim); color: var(--info); }
+    .pill-pris { background: var(--accent-dim); color: var(--accent); }
+    .pill-recup { background: var(--warn-dim); color: var(--warn); }
+
+    .bounty-row2 {
+      display: flex; align-items: center; gap: 6px;
+      margin-top: 2px; font-size: 10px; color: var(--text-muted);
+    }
+    .bounty-zone { color: var(--info); font-weight: 500; }
+    .bounty-token { color: var(--accent); }
+    .bounty-token-k { color: var(--info); }
+    .bounty-lv {
+      font-size: 10px; font-weight: 700; color: var(--text-muted);
+      flex-shrink: 0; margin-left: auto;
+    }
+
+    .bounty-actions {
+      display: flex; gap: 3px; flex-shrink: 0;
+    }
+    .act-btn {
+      width: 26px; height: 22px; border: 1px solid var(--border);
+      border-radius: var(--radius-sm); background: transparent;
+      color: var(--text-muted); cursor: pointer;
+      font-size: 10px; display: flex; align-items: center;
+      justify-content: center; transition: all 0.12s; font-family: inherit;
+    }
+    .act-btn:hover { border-color: var(--text-secondary); color: var(--text); }
+    .act-btn.a-pris { border-color: var(--accent); background: var(--accent-dim); color: var(--accent); }
+    .act-btn.a-fait { border-color: var(--success); background: var(--success-dim); color: var(--success); }
+    .act-btn.a-recup { border-color: var(--warn); background: var(--warn-dim); color: var(--warn); }
+
+    /* ─── FOOTER ─── */
+    .footer {
+      display: flex; gap: 12px; padding: 6px 14px;
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+      flex-shrink: 0; font-size: 10px; align-items: center;
+    }
+    .footer-stat { display: flex; gap: 3px; align-items: center; }
+    .footer-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+    }
+    .footer-val { font-weight: 700; }
+    .dot-pris { background: var(--accent); }
+    .dot-fait { background: var(--success); }
+    .dot-recup { background: var(--warn); }
+
+    /* OCR BAR */
+    .ocr-bar {
+      display: flex; gap: 6px; padding: 5px 14px;
+      background: var(--bg-surface); border-bottom: 1px solid var(--border);
+      flex-shrink: 0; align-items: center;
+    }
+    .ocr-btn {
+      padding: 4px 10px; background: var(--bg-raised);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      color: var(--accent); font-size: 10px; font-weight: 600;
+      cursor: pointer; font-family: inherit; transition: all 0.12s;
+    }
+    .ocr-btn:hover { background: var(--accent-dim); border-color: var(--accent); }
+    .ocr-status { font-size: 10px; color: var(--text-muted); flex: 1; }
+
+    /* UPDATE BAR */
+    .update-bar {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 6px 14px; background: var(--accent-dim);
+      border-bottom: 1px solid var(--accent); flex-shrink: 0;
+      font-size: 11px; font-weight: 600; color: var(--accent);
+    }
+    .update-bar button {
+      padding: 3px 12px; background: var(--accent); border: none;
+      border-radius: var(--radius); color: #000; font-size: 10px;
+      font-weight: 700; cursor: pointer; font-family: inherit;
+    }
+    .update-bar button:hover { opacity: 0.8; }
+
+    .empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 11px; line-height: 1.6; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="titlebar">
+    <span class="titlebar-title">WANTED</span>
+    <div class="titlebar-btns">
+      <button class="tb-btn" id="btnMin">&#8722;</button>
+      <button class="tb-btn tb-close" id="btnClose">&#10005;</button>
+    </div>
+  </div>
+  <div class="update-bar hidden" id="updateBar">
+    <span id="updateText">Nouvelle version disponible !</span>
+    <button id="updateBtn">Mettre a jour</button>
+  </div>
+  <div class="header">
+    <div class="header-top">
+      <div class="header-inputs">
+        <div class="input-pill">
+          <label>Niv</label>
+          <input type="number" id="levelInput" min="1" max="200" value="200" />
+        </div>
+        <div class="input-pill align">
+          <label>Align</label>
+          <input type="number" id="alignInput" min="0" max="100" value="0" />
+        </div>
+        <div class="input-pill align">
+          <label>Ordre</label>
+          <input type="number" id="ordreInput" min="0" max="5" value="0" />
+        </div>
+        <div class="opacity-slider">
+          <input type="range" id="opacitySlider" min="30" max="100" value="100" title="Opacite" />
+        </div>
+      </div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <span class="progress-label" id="progressText">0 / 80</span>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="recup">A recuperer <span class="tab-count" id="tabCount1">0</span></div>
+    <div class="tab" data-tab="encours">En cours <span class="tab-count" id="tabCount2">0</span></div>
+    <div class="tab" data-tab="faits">Faits <span class="tab-count" id="tabCount3">0</span></div>
+  </div>
+
+  <!-- OCR toolbar -->
+  <div class="ocr-bar" id="ocrBar">
+    <button class="ocr-btn" id="ocrPris">Scan En cours</button>
+    <button class="ocr-btn" id="ocrFait">Scan Faits</button>
+    <span class="ocr-status" id="ocrStatus">Win+Shift+S puis Ctrl+V</span>
+  </div>
+
+  <!-- PAGE 1: A recuperer -->
+  <div class="toolbar" id="toolbar1">
+    <input class="search-input" type="text" id="search1" placeholder="Rechercher..." />
+    <select class="filter-chip" id="filterMilice">
+      <option value="all">Milice</option>
+    </select>
+    <select class="filter-chip" id="filterView">
+      <option value="milice">Par milice</option>
+      <option value="level">Par niveau</option>
+      <option value="flat">Liste</option>
+    </select>
+    <select class="filter-chip" id="filterProt">
+      <option value="all">Protect.</option>
+      <option value="aucune">Aucune</option>
+      <option value="invuln">Invuln.</option>
+      <option value="reduc">Reduc.</option>
+    </select>
+  </div>
+  <div class="content" id="page-recup"></div>
+
+  <!-- PAGE 2: En cours -->
+  <div class="toolbar hidden" id="toolbar2">
+    <input class="search-input" type="text" id="search2" placeholder="Rechercher..." />
+  </div>
+  <div class="content hidden" id="page-encours"></div>
+
+  <!-- PAGE 3: Faits -->
+  <div class="toolbar hidden" id="toolbar3">
+    <input class="search-input" type="text" id="search3" placeholder="Rechercher..." />
+  </div>
+  <div class="content hidden" id="page-faits"></div>
+
+  <div class="footer">
+    <div class="footer-stat"><div class="footer-dot dot-pris"></div><span class="footer-val" id="sfEncours">0</span> en cours</div>
+    <div class="footer-stat"><div class="footer-dot dot-fait"></div><span class="footer-val" id="sfFaits">0</span> faits</div>
+    <div style="flex:1"></div>
+    <span style="color:var(--accent);font-weight:600" id="sfDoplons">0</span><span style="color:var(--text-muted)"> dop</span>
+    <span style="color:var(--danger);font-weight:600" id="sfAlitons">0</span><span style="color:var(--text-muted)"> ali</span>
+    <span style="color:var(--text-muted);margin-left:4px">| Capia</span>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" integrity="sha384-GJqSu7vueQ9qN0E9yLPb3Wtpd7OrgK8KmYzC8T1IysG1bcvxvIO4qtYR/D3A991F" crossorigin="anonymous"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

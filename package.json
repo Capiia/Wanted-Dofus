@@ -1,0 +1,33 @@
+{
+  "name": "wanted",
+  "version": "1.1.0",
+  "description": "Tracker d'avis de recherche pour Dofus",
+  "main": "main.js",
+  "author": "Capia",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win --dir",
+    "build": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.capia.wanted",
+    "productName": "Wanted",
+    "win": {
+      "target": ["nsis"],
+      "icon": "icons/appIcon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "language": "1036"
+    },
+    "files": ["main.js", "app.html", "js/**/*", "img/**/*", "icons/**/*"],
+    "extraResources": []
+  },
+  "devDependencies": {
+    "electron": "35.7.5",
+    "electron-builder": "^25.0.0"
+  }
+}
