@@ -10,9 +10,9 @@ Tracker d'avis de recherche pour Dofus. Inspire par [Ganymede](https://ganymede-
 
 ## Installation
 
-1. Telecharge `Wanted-v1.1.0-win.zip` depuis les [Releases](../../releases/latest)
-2. Decompresse le zip ou tu veux
-3. Lance `Wanted.exe`
+1. Telecharge `Wanted_Setup.exe` depuis les [Releases](../../releases/latest)
+2. Lance-le et suis les instructions
+3. Wanted apparait dans le menu Demarrer et sur le bureau
 
 ## Utilisation
 
