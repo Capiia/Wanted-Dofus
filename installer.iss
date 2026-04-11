@@ -29,3 +29,40 @@ Name: "desktopicon"; Description: "Creer un raccourci sur le bureau"; GroupDescr
 
 [Run]
 Filename: "{app}\Wanted.exe"; Description: "Lancer Wanted"; Flags: nowait postinstall skipifsilent
+
+[Code]
+procedure MigrateOldData;
+var
+  OldPath, NewDir, NewPath: String;
+begin
+  NewDir := ExpandConstant('{userappdata}\wanted');
+  NewPath := NewDir + '\state.json';
+
+  // Ne migrer que si le nouveau fichier n'existe pas deja
+  if not FileExists(NewPath) then
+  begin
+    // Essayer l'ancienne version Neutralino
+    OldPath := ExpandConstant('{autopf}\Wanted\.storage\dofus_rech.neustorage');
+    if FileExists(OldPath) then
+    begin
+      ForceDirectories(NewDir);
+      CopyFile(OldPath, NewPath, False);
+    end
+    else
+    begin
+      // Essayer aussi l'ancien chemin Neutralino "Wanted by Capia"
+      OldPath := ExpandConstant('{autopf}\Wanted by Capia\.storage\dofus_rech.neustorage');
+      if FileExists(OldPath) then
+      begin
+        ForceDirectories(NewDir);
+        CopyFile(OldPath, NewPath, False);
+      end;
+    end;
+  end;
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssPostInstall then
+    MigrateOldData;
+end;
