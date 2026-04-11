@@ -65,8 +65,10 @@
     /* ─── HEADER ─── */
     .header {
       padding: 10px 14px 8px;
+      padding-top: 36px;
       background: var(--bg-surface);
       border-bottom: 1px solid var(--border);
+      -webkit-app-region: drag;
       flex-shrink: 0;
     }
     .header-top {
@@ -98,6 +100,7 @@
     .input-pill input[type="number"]::-webkit-inner-spin-button,
     .input-pill input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
     .input-pill input[type="number"]:focus { outline: none; }
+    .header-inputs, .header-inputs * { -webkit-app-region: no-drag; }
     .input-pill.align input { color: var(--warn); }
     .opacity-slider {
       display: flex; align-items: center; gap: 4px;
@@ -323,13 +326,6 @@
 </head>
 <body>
 
-  <div class="titlebar">
-    <span class="titlebar-title">WANTED</span>
-    <div class="titlebar-btns">
-      <button class="tb-btn" id="btnMin">&#8722;</button>
-      <button class="tb-btn tb-close" id="btnClose">&#10005;</button>
-    </div>
-  </div>
   <div class="update-bar hidden" id="updateBar">
     <span id="updateText">Nouvelle version disponible !</span>
     <button id="updateBtn">Mettre a jour</button>

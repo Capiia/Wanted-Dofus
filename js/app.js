@@ -555,10 +555,6 @@ document.addEventListener('keydown', async (e) => {
   }
 });
 
-// === WINDOW CONTROLS ===
-document.getElementById('btnMin').addEventListener('click', () => ipcRenderer.send('win-minimize'));
-document.getElementById('btnClose').addEventListener('click', () => ipcRenderer.send('win-close'));
-
 // === OPACITY (native Electron!) ===
 document.getElementById('opacitySlider').addEventListener('input', (e) => {
   ipcRenderer.send('set-opacity', parseInt(e.target.value) / 100);

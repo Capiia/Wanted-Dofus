@@ -17,11 +17,17 @@ app.on('ready', () => {
     minHeight: 400,
     alwaysOnTop: true,
     opacity: 1,
-    frame: false,
+    frame: true,
     resizable: true,
     skipTaskbar: false,
     backgroundColor: '#0c0c0f',
     autoHideMenuBar: true,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#0c0c0f',
+      symbolColor: '#8e8e96',
+      height: 32
+    },
     icon: path.join(__dirname, 'icons', 'appIcon.ico'),
     webPreferences: {
       nodeIntegration: true,
