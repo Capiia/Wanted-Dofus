@@ -565,10 +565,12 @@ document.getElementById('opacitySlider').addEventListener('input', (e) => {
 });
 
 // === UPDATE CHECK ===
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.2.0';
 const GITHUB_REPO = 'Capiia/Wanted-Dofus';
 
 async function checkForUpdate() {
+  // Skip update in dev mode: packaged app has __dirname inside app.asar
+  if (!__dirname.includes('app.asar')) return;
   try {
     const resp = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
     if (!resp.ok) return;

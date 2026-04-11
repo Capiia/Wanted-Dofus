@@ -20,7 +20,6 @@ app.on('ready', () => {
     frame: false,
     resizable: true,
     skipTaskbar: false,
-    type: 'toolbar',
     backgroundColor: '#0c0c0f',
     autoHideMenuBar: true,
     icon: path.join(__dirname, 'icons', 'appIcon.ico'),
@@ -88,7 +87,7 @@ app.on('ready', () => {
             // Create batch script to replace asar and restart
             const exePath = app.getPath('exe');
             const bat = `@echo off
-timeout /t 2 /nobreak >nul
+ping 127.0.0.1 -n 3 >nul
 del "${asarPath}.bak" 2>nul
 ren "${asarPath}" "app.asar.bak"
 ren "${newPath}" "app.asar"
