@@ -575,20 +575,52 @@ async function checkForUpdate() {
     const release = await resp.json();
     if (!release.tag_name) return;
     const latest = release.tag_name.replace('v', '');
-    if (latest !== APP_VERSION) {
-      const asset = release.assets && release.assets.find(a => a.name.endsWith('.exe'));
-      if (!asset) return;
+    if (latest === APP_VERSION) return;
+
+    const asar = release.assets && release.assets.find(a => a.name === 'app.asar');
+    if (!asar) return;
+
+    // Auto-update if enabled
+    if (state.autoUpdate !== false) {
+      await applyUpdate(asar.browser_download_url);
+    } else {
+      // Just show the banner
       document.getElementById('updateBar').classList.remove('hidden');
       document.getElementById('updateBtn').addEventListener('click', () => {
-        ipcRenderer.send('open-url', asset.browser_download_url);
+        applyUpdate(asar.browser_download_url);
       }, { once: true });
     }
   } catch(e) {}
 }
 
+async function applyUpdate(url) {
+  const bar = document.getElementById('updateBar');
+  const progress = document.getElementById('updateProgress');
+  bar.classList.add('hidden');
+  progress.classList.remove('hidden');
+  document.getElementById('updateProgressText').textContent = 'Telechargement de la mise a jour...';
+  try {
+    // Save state before restart
+    await ipcRenderer.invoke('save-state', JSON.stringify(state));
+    const batPath = await ipcRenderer.invoke('download-update', url);
+    document.getElementById('updateProgressText').textContent = 'Redemarrage...';
+    ipcRenderer.send('run-update-and-quit', batPath);
+  } catch(e) {
+    document.getElementById('updateProgressText').textContent = 'Erreur: ' + e;
+    setTimeout(() => progress.classList.add('hidden'), 5000);
+  }
+}
+
+// === AUTO-UPDATE CHECKBOX ===
+document.getElementById('autoUpdateCheck').addEventListener('change', (e) => {
+  state.autoUpdate = e.target.checked;
+  save();
+});
+
 // === INIT ===
 async function init() {
   try { await loadFromDisk(); } catch(e) {}
+  document.getElementById('autoUpdateCheck').checked = state.autoUpdate !== false;
   checkForUpdate();
 }
 populateMiliceFilter();

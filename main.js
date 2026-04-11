@@ -62,6 +62,51 @@ app.on('ready', () => {
   ipcMain.on('open-url', (_, url) => {
     if (url.startsWith('http')) shell.openExternal(url);
   });
+
+  // Auto-update: download app.asar and replace
+  ipcMain.handle('download-update', async (_, url) => {
+    const https = require('https');
+    const appDir = path.dirname(app.getPath('exe'));
+    const asarPath = path.join(appDir, 'resources', 'app.asar');
+    const newPath = asarPath + '.new';
+    const batPath = path.join(appDir, 'update.bat');
+
+    return new Promise((resolve, reject) => {
+      // Follow redirects (GitHub gives 302)
+      const download = (downloadUrl) => {
+        https.get(downloadUrl, { headers: { 'User-Agent': 'Wanted' } }, (res) => {
+          if (res.statusCode === 302 || res.statusCode === 301) {
+            download(res.headers.location);
+            return;
+          }
+          if (res.statusCode !== 200) { reject('HTTP ' + res.statusCode); return; }
+
+          const file = fs.createWriteStream(newPath);
+          res.pipe(file);
+          file.on('finish', () => {
+            file.close();
+            // Create batch script to replace asar and restart
+            const exePath = app.getPath('exe');
+            const bat = `@echo off
+timeout /t 2 /nobreak >nul
+del "${asarPath}.bak" 2>nul
+ren "${asarPath}" "app.asar.bak"
+ren "${newPath}" "app.asar"
+start "" "${exePath}"
+del "%~f0"`;
+            fs.writeFileSync(batPath, bat);
+            resolve(batPath);
+          });
+        }).on('error', reject);
+      };
+      download(url);
+    });
+  });
+
+  ipcMain.on('run-update-and-quit', (_, batPath) => {
+    require('child_process').exec(`start "" "${batPath}"`, () => {});
+    setTimeout(() => app.quit(), 500);
+  });
 });
 
 app.on('window-all-closed', () => app.quit());
