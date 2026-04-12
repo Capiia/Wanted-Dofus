@@ -96,8 +96,14 @@ app.on('ready', () => {
 ping 127.0.0.1 -n 3 >nul
 del "${asarPath}.bak" 2>nul
 ren "${asarPath}" "app.asar.bak"
+if not exist "${newPath}" goto fail
 ren "${newPath}" "app.asar"
+if not exist "${asarPath}" goto fail
 start "" "${exePath}"
+goto end
+:fail
+if exist "${asarPath}.bak" ren "${asarPath}.bak" "app.asar"
+:end
 del "%~f0"`;
             fs.writeFileSync(batPath, bat);
             resolve(batPath);
