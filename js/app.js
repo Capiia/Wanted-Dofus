@@ -561,11 +561,11 @@ document.getElementById('opacitySlider').addEventListener('input', (e) => {
 });
 
 // === UPDATE CHECK ===
-const APP_VERSION = '1.2.0';
+const APP_VERSION = '1.3.0';
 const GITHUB_REPO = 'Capiia/Wanted-Dofus';
 
 async function checkForUpdate() {
-  // Skip update in dev mode: packaged app has __dirname inside app.asar
+  // Skip in dev mode
   if (!__dirname.includes('app.asar')) return;
   try {
     const resp = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
@@ -575,50 +575,21 @@ async function checkForUpdate() {
     const latest = release.tag_name.replace('v', '');
     if (latest === APP_VERSION) return;
 
-    const asar = release.assets && release.assets.find(a => a.name === 'app.asar');
-    if (!asar) return;
+    const setup = release.assets && release.assets.find(a => a.name.endsWith('.exe'));
+    if (!setup) return;
 
-    // Auto-update if enabled
-    if (state.autoUpdate !== false) {
-      await applyUpdate(asar.browser_download_url);
-    } else {
-      // Just show the banner
-      document.getElementById('updateBar').classList.remove('hidden');
-      document.getElementById('updateBtn').addEventListener('click', () => {
-        applyUpdate(asar.browser_download_url);
-      }, { once: true });
-    }
+    document.getElementById('updateBar').classList.remove('hidden');
+    document.getElementById('updateText').textContent = `v${latest} disponible !`;
+    document.getElementById('updateBtn').addEventListener('click', () => {
+      ipcRenderer.send('open-url', setup.browser_download_url);
+      document.getElementById('updateText').textContent = 'Telechargement lance. Relance le setup une fois termine.';
+    }, { once: true });
   } catch(e) {}
 }
-
-async function applyUpdate(url) {
-  const bar = document.getElementById('updateBar');
-  const progress = document.getElementById('updateProgress');
-  bar.classList.add('hidden');
-  progress.classList.remove('hidden');
-  document.getElementById('updateProgressText').textContent = 'Telechargement de la mise a jour...';
-  try {
-    // Save state before restart
-    await ipcRenderer.invoke('save-state', JSON.stringify(state));
-    const batPath = await ipcRenderer.invoke('download-update', url);
-    document.getElementById('updateProgressText').textContent = 'Redemarrage...';
-    ipcRenderer.send('run-update-and-quit', batPath);
-  } catch(e) {
-    document.getElementById('updateProgressText').textContent = 'Erreur: ' + e;
-    setTimeout(() => progress.classList.add('hidden'), 5000);
-  }
-}
-
-// === AUTO-UPDATE CHECKBOX ===
-document.getElementById('autoUpdateCheck').addEventListener('change', (e) => {
-  state.autoUpdate = e.target.checked;
-  save();
-});
 
 // === INIT ===
 async function init() {
   try { await loadFromDisk(); } catch(e) {}
-  document.getElementById('autoUpdateCheck').checked = state.autoUpdate !== false;
   checkForUpdate();
 }
 populateMiliceFilter();
