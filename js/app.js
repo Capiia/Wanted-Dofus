@@ -211,18 +211,21 @@ function showTab() {
 }
 
 // === BOUNTY HTML ===
-function bHTML(b) {
+function bHTML(b, lockReason) {
   const st=gs(b.n), done=st==='fait';
   let pills='';
   if(b.al) pills+=`<span class="pill pill-align">ALIGN</span>`;
   if(b.p.includes('Invuln')) pills+=`<span class="pill pill-invuln">INVULN</span>`;
   else if(b.p.includes('Reduc')) pills+=`<span class="pill pill-reduc">REDUC</span>`;
   if(st==='pris') pills+=`<span class="pill pill-pris">PRIS</span>`;
+  if(st==='fait') pills+=`<span class="pill" style="background:rgba(92,184,92,0.2);color:var(--success)">FAIT</span>`;
 
   let tok=[];
   if(b.dop) tok.push(`<span class="bounty-token">${b.dop.toLocaleString('fr-FR')}</span>`);
   if(b.ali) tok.push(`<span style="color:var(--danger)">${b.ali} ali</span>`);
   if(b.kg) tok.push(`<span class="bounty-token-k">${b.kg} Kamas Glace</span>`);
+
+  const lockHtml = lockReason ? `<div class="bounty-lock-reason">${lockReason}</div>` : '';
 
   return `<div class="bounty ${done?'is-done':''}">
     <img class="bounty-img" src="img/${slug(b.n)}.png" onerror="this.style.visibility='hidden'" />
@@ -232,6 +235,7 @@ function bHTML(b) {
         <span class="bounty-zone">${b.z}</span>
         <span>\u00b7</span>${tok.join(' <span>\u00b7</span> ')}
       </div>
+      ${lockHtml}
     </div>
     <span class="bounty-lv">${b.m==='Alignement' ? (b.ord ? 'Ordre '+b.ord : 'Align '+(b.alReq||1)) : 'Niv.'+b.lv}</span>
     <div class="bounty-actions">
@@ -253,116 +257,138 @@ function secH(key, label, count, cls) {
 
 // === PAGE 1 ===
 // === PAGE 1: A RECUPERER (not yet taken) ===
-function renderP1() {
-  const lv=state.lv, al=state.al||0;
-  const q=document.getElementById('search1').value.toLowerCase();
-  const view=document.getElementById('filterView').value;
-  const prot=document.getElementById('filterProt').value;
-  const mil=document.getElementById('filterMilice').value;
+// Build extra sections for cross-tab search matches
+function buildCrossSearchSections(query, excludeStatus) {
+  if (!query) return '';
+  let h = '';
 
-  const rest = B.filter(b=>{
-    if(gs(b.n)!=='none') return false;
-    if(b.lv>lv) return false;
-    // Alignement: check niveau alignement + ordre
-    if(b.m === 'Alignement') {
-      if(al === 0) return false; // pas aligne
-      if(b.alReq && al < b.alReq) return false; // niveau alignement insuffisant
-      if(b.ord && b.ord > (state.ord||0)) return false; // ordre insuffisant
-    }
-    if(q && !b.n.toLowerCase().includes(q) && !b.z.toLowerCase().includes(q) && !b.m.toLowerCase().includes(q)) return false;
-    if(mil!=='all' && b.m!==mil) return false;
-    if(prot==='aucune' && b.p!=='Aucune') return false;
-    if(prot==='invuln' && !b.p.includes('Invuln')) return false;
-    if(prot==='reduc' && !b.p.includes('Reduc')) return false;
+  // Matches in other statuses
+  const statuses = [
+    { key: 'pris', label: 'EN COURS (autre onglet)', cls: 'ss-encours' },
+    { key: 'fait', label: 'FAITS (autre onglet)', cls: 'ss-fait' },
+    { key: 'none', label: 'A RECUPERER (autre onglet)', cls: 'ss-recup' }
+  ];
+
+  statuses.forEach(s => {
+    if (s.key === excludeStatus) return;
+    const items = B.filter(b => gs(b.n) === s.key && matchSearch(b, query));
+    if (!items.length) return;
+    // For "none" status, filter out locked ones - they go in "locked" section instead
+    const accessible = s.key === 'none' ? items.filter(b => checkAccessible(b).ok) : items;
+    if (!accessible.length) return;
+    h += `<div class="search-section-header ${s.cls}">${s.label} (${accessible.length})</div>`;
+    accessible.forEach(b => { h += bHTML(b); });
+  });
+
+  // Prerequis manquants (only none status, not accessible)
+  const locked = B.filter(b => gs(b.n) === 'none' && matchSearch(b, query) && !checkAccessible(b).ok);
+  if (locked.length) {
+    h += `<div class="search-section-header ss-locked">PREREQUIS MANQUANTS (${locked.length})</div>`;
+    locked.forEach(b => { h += bHTML(b, checkAccessible(b).reason); });
+  }
+
+  return h;
+}
+
+function renderP1() {
+  const q = document.getElementById('search1').value;
+  const view = document.getElementById('filterView').value;
+  const prot = document.getElementById('filterProt').value;
+  const mil = document.getElementById('filterMilice').value;
+
+  // Main results: accessible, not taken, status="none"
+  const rest = B.filter(b => {
+    if (gs(b.n) !== 'none') return false;
+    if (!checkAccessible(b).ok) return false;
+    if (!matchSearch(b, q)) return false;
+    if (mil !== 'all' && b.m !== mil) return false;
+    if (prot === 'aucune' && b.p !== 'Aucune') return false;
+    if (prot === 'invuln' && !b.p.includes('Invuln')) return false;
+    if (prot === 'reduc' && !b.p.includes('Reduc')) return false;
     return true;
   });
 
-  const el=document.getElementById('page-recup');
-  if(!rest.length){ el.innerHTML='<div class="empty">Tous les avis sont pris ou termines !</div>'; return; }
+  const el = document.getElementById('page-recup');
+  let h = '';
 
-  let h='';
-  if(view==='milice'){
-    const g={};
-    rest.forEach(b=>{ (g[b.m]=g[b.m]||[]).push(b); });
-    Object.keys(g).sort().forEach(m=>{
-      h+=secH(m,m,g[m].length,'s-zone');
-      if(!collapsed[m]) g[m].sort((a,b)=>a.lv-b.lv).forEach(b=>{h+=bHTML(b);});
-    });
-  } else if(view==='level'){
-    const g={};
-    rest.forEach(b=>{
-      const k=b.al?'Alignement':`Niv. ${Math.floor((b.lv-1)/20)*20+1}-${Math.floor((b.lv-1)/20)*20+20}`;
-      (g[k]=g[k]||[]).push(b);
-    });
-    Object.entries(g).forEach(([k,items])=>{
-      h+=secH(k,k,items.length,'s-zone');
-      if(!collapsed[k]) items.sort((a,b)=>a.lv-b.lv).forEach(b=>{h+=bHTML(b);});
-    });
-  } else {
-    rest.sort((a,b)=>a.lv-b.lv).forEach(b=>{h+=bHTML(b);});
+  if (rest.length) {
+    if (view === 'milice') {
+      const g = {};
+      rest.forEach(b => { (g[b.m] = g[b.m] || []).push(b); });
+      Object.keys(g).sort().forEach(m => {
+        h += secH(m, m, g[m].length, 's-zone');
+        if (!collapsed[m]) g[m].sort((a, b) => a.lv - b.lv).forEach(b => { h += bHTML(b); });
+      });
+    } else if (view === 'level') {
+      const g = {};
+      rest.forEach(b => {
+        const k = b.al ? 'Alignement' : `Niv. ${Math.floor((b.lv - 1) / 20) * 20 + 1}-${Math.floor((b.lv - 1) / 20) * 20 + 20}`;
+        (g[k] = g[k] || []).push(b);
+      });
+      Object.entries(g).forEach(([k, items]) => {
+        h += secH(k, k, items.length, 's-zone');
+        if (!collapsed[k]) items.sort((a, b) => a.lv - b.lv).forEach(b => { h += bHTML(b); });
+      });
+    } else {
+      rest.sort((a, b) => a.lv - b.lv).forEach(b => { h += bHTML(b); });
+    }
   }
-  el.innerHTML=h;
+
+  // Cross-search results
+  h += buildCrossSearchSections(q, 'none');
+
+  if (!h) { el.innerHTML = '<div class="empty">Aucun resultat.</div>'; return; }
+  el.innerHTML = h;
 }
 
 // === PAGE 2: EN COURS (pris) ===
 function renderP2() {
-  const q=document.getElementById('search2').value.toLowerCase();
-  const list=B.filter(b=>{
-    if(gs(b.n)!=='pris') return false;
-    if(q && !b.n.toLowerCase().includes(q) && !b.z.toLowerCase().includes(q)) return false;
-    return true;
-  });
-  const el=document.getElementById('page-encours');
-  if(!list.length){ el.innerHTML='<div class="empty">Aucune quete en cours.</div>'; return; }
-  // Group by milice
-  const g={};
-  list.forEach(b=>{ (g[b.m]=g[b.m]||[]).push(b); });
-  let h='';
-  Object.keys(g).sort().forEach(m=>{
-    h+=secH('ec_'+m,m,g[m].length,'s-pris');
-    if(!collapsed['ec_'+m]) g[m].sort((a,b)=>a.lv-b.lv).forEach(b=>{h+=bHTML(b);});
-  });
-  el.innerHTML=h;
+  const q = document.getElementById('search2').value;
+  const list = B.filter(b => gs(b.n) === 'pris' && matchSearch(b, q));
+  const el = document.getElementById('page-encours');
+  let h = '';
+  if (list.length) {
+    const g = {};
+    list.forEach(b => { (g[b.m] = g[b.m] || []).push(b); });
+    Object.keys(g).sort().forEach(m => {
+      h += secH('ec_' + m, m, g[m].length, 's-pris');
+      if (!collapsed['ec_' + m]) g[m].sort((a, b) => a.lv - b.lv).forEach(b => { h += bHTML(b); });
+    });
+  }
+  h += buildCrossSearchSections(q, 'pris');
+  if (!h) { el.innerHTML = '<div class="empty">Aucune quete en cours.</div>'; return; }
+  el.innerHTML = h;
 }
 
 // === PAGE 3: FAITS ===
 function renderP3() {
-  const q=document.getElementById('search3').value.toLowerCase();
-  const list=B.filter(b=>{
-    if(gs(b.n)!=='fait') return false;
-    if(q && !b.n.toLowerCase().includes(q) && !b.z.toLowerCase().includes(q)) return false;
-    return true;
-  });
-  const el=document.getElementById('page-faits');
-  if(!list.length){ el.innerHTML='<div class="empty">Aucune quete terminee.</div>'; return; }
-  // Group by milice
-  const g={};
-  list.forEach(b=>{ (g[b.m]=g[b.m]||[]).push(b); });
-  let h='';
-  Object.keys(g).sort().forEach(m=>{
-    h+=secH('ft_'+m,m,g[m].length,'s-fait');
-    if(!collapsed['ft_'+m]) g[m].sort((a,b)=>a.lv-b.lv).forEach(b=>{h+=bHTML(b);});
-  });
+  const q = document.getElementById('search3').value;
+  const list = B.filter(b => gs(b.n) === 'fait' && matchSearch(b, q));
+  const el = document.getElementById('page-faits');
+  let h = '';
+  if (list.length) {
+    const g = {};
+    list.forEach(b => { (g[b.m] = g[b.m] || []).push(b); });
+    Object.keys(g).sort().forEach(m => {
+      h += secH('ft_' + m, m, g[m].length, 's-fait');
+      if (!collapsed['ft_' + m]) g[m].sort((a, b) => a.lv - b.lv).forEach(b => { h += bHTML(b); });
+    });
+  }
+  h += buildCrossSearchSections(q, 'fait');
+  if (!h) { el.innerHTML = '<div class="empty">Aucune quete terminee.</div>'; return; }
   el.innerHTML=h;
 }
 
 // === STATS ===
 function renderStats() {
-  let p=0,f=0,d=0,a=0;
-  const acc=B.filter(b=>{
-    if(b.lv>state.lv) return false;
-    if(b.m==='Alignement') {
-      if(state.al===0) return false;
-      if(b.alReq && state.al < b.alReq) return false;
-      if(b.ord && b.ord > (state.ord||0)) return false;
-    }
-    return true;
-  }).length;
-  B.forEach(b=>{ const s=gs(b.n); if(s==='pris')p++; if(s==='fait'){f++;d+=b.dop||0;a+=b.ali||0;} });
+  let p=0,f=0,d=0,a=0,kg=0;
+  const acc = B.filter(b => checkAccessible(b).ok).length;
+  B.forEach(b=>{ const s=gs(b.n); if(s==='pris')p++; if(s==='fait'){f++;d+=b.dop||0;a+=b.ali||0;kg+=b.kg||0;} });
   document.getElementById('sfEncours').textContent=p;
   document.getElementById('sfFaits').textContent=f;
   document.getElementById('sfDoplons').textContent=d.toLocaleString('fr-FR');
   document.getElementById('sfAlitons').textContent=a;
+  document.getElementById('sfKamas').textContent=kg;
   const pct=acc>0?(f/acc*100):0;
   document.getElementById('progressFill').style.width=pct+'%';
   document.getElementById('progressText').textContent=`${f} / ${acc}`;
@@ -421,6 +447,30 @@ function norm(s) {
   return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase().replace(/[''`\u2019\u2018]/g, ' ')
     .replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+// Aggressive normalize for search: no spaces, no special chars at all
+function normSearch(s) {
+  return (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+// Check if a bounty is accessible (returns {ok: bool, reason: string})
+function checkAccessible(b) {
+  if (b.lv > state.lv) return { ok: false, reason: `Niveau ${b.lv} requis (tu es ${state.lv})` };
+  if (b.m === 'Alignement') {
+    if ((state.al || 0) === 0) return { ok: false, reason: 'Alignement requis' };
+    if (b.alReq && state.al < b.alReq) return { ok: false, reason: `Alignement ${b.alReq} requis (tu es ${state.al})` };
+    if (b.ord && b.ord > (state.ord || 0)) return { ok: false, reason: `Ordre ${b.ord} requis (tu es ${state.ord || 0})` };
+  }
+  return { ok: true };
+}
+
+// Check if bounty matches search query
+function matchSearch(b, query) {
+  if (!query) return true;
+  const q = normSearch(query);
+  return normSearch(b.n).includes(q) || normSearch(b.z).includes(q) || normSearch(b.m).includes(q);
 }
 
 const BOUNTY_NORMS = B.map(b => ({
@@ -587,10 +637,40 @@ async function checkForUpdate() {
   } catch(e) {}
 }
 
+// === INFO MODAL ===
+document.getElementById('infoBtn').addEventListener('click', () => {
+  let totalDop = 0, totalAli = 0, totalKg = 0, totalN = 0;
+  let doneDop = 0, doneAli = 0, doneKg = 0, doneN = 0;
+  B.forEach(b => {
+    totalDop += b.dop || 0;
+    totalAli += b.ali || 0;
+    totalKg += b.kg || 0;
+    totalN++;
+    if (gs(b.n) === 'fait') {
+      doneDop += b.dop || 0;
+      doneAli += b.ali || 0;
+      doneKg += b.kg || 0;
+      doneN++;
+    }
+  });
+  document.getElementById('infoDop').textContent = `${doneDop.toLocaleString('fr-FR')} / ${totalDop.toLocaleString('fr-FR')}`;
+  document.getElementById('infoAli').textContent = `${doneAli} / ${totalAli}`;
+  document.getElementById('infoKg').textContent = `${doneKg} / ${totalKg}`;
+  document.getElementById('infoCount').textContent = `${doneN} / ${totalN}`;
+  document.getElementById('infoModal').classList.remove('hidden');
+});
+document.getElementById('infoClose').addEventListener('click', () => {
+  document.getElementById('infoModal').classList.add('hidden');
+});
+document.getElementById('infoModal').addEventListener('click', (e) => {
+  if (e.target.id === 'infoModal') document.getElementById('infoModal').classList.add('hidden');
+});
+
 // === INIT ===
 async function init() {
   try { await loadFromDisk(); } catch(e) {}
-  checkForUpdate();
+  // Defer update check to not block UI
+  setTimeout(() => checkForUpdate(), 2000);
 }
 populateMiliceFilter();
 document.getElementById('levelInput').value = state.lv;

@@ -319,6 +319,53 @@
     }
     .update-bar button:hover { opacity: 0.8; }
 
+    /* INFO BUTTON & MODAL */
+    .info-btn {
+      width: 16px; height: 16px; border-radius: 50%;
+      background: var(--bg-raised); border: 1px solid var(--border);
+      color: var(--text-muted); font-size: 9px; font-weight: 700;
+      cursor: pointer; font-family: inherit; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .info-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .info-modal {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      display: flex; align-items: center; justify-content: center; z-index: 100;
+    }
+    .info-content {
+      background: var(--bg-surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 20px; min-width: 260px;
+    }
+    .info-content h3 {
+      font-size: 13px; color: var(--accent); margin-bottom: 14px;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .info-row {
+      display: flex; justify-content: space-between;
+      padding: 6px 0; border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .info-row:last-of-type { border-bottom: none; }
+    .info-row span:first-child { color: var(--text-muted); }
+    .info-row span:last-child { color: var(--text); font-weight: 600; }
+    .info-content button {
+      margin-top: 12px; width: 100%; padding: 6px;
+      background: var(--accent); color: #000; border: none;
+      border-radius: 4px; font-weight: 700; cursor: pointer; font-family: inherit;
+    }
+
+    /* SEARCH RESULT SECTIONS */
+    .search-section-header {
+      padding: 6px 14px; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      background: var(--bg-surface); border-top: 1px solid var(--border);
+    }
+    .search-section-header.ss-recup { color: var(--info); }
+    .search-section-header.ss-encours { color: var(--accent); }
+    .search-section-header.ss-fait { color: var(--success); }
+    .search-section-header.ss-locked { color: var(--danger); }
+    .bounty-lock-reason { font-size: 9px; color: var(--danger); margin-top: 2px; font-weight: 600; }
+
     .empty { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 11px; line-height: 1.6; }
 
     .hidden { display: none !important; }
@@ -404,13 +451,27 @@
   <div class="footer">
     <div class="footer-stat"><div class="footer-dot dot-pris"></div><span class="footer-val" id="sfEncours">0</span> en cours</div>
     <div class="footer-stat"><div class="footer-dot dot-fait"></div><span class="footer-val" id="sfFaits">0</span> faits</div>
+    <button class="info-btn" id="infoBtn" title="Voir les totaux">i</button>
     <div style="flex:1"></div>
     <span style="color:var(--accent);font-weight:600" id="sfDoplons">0</span><span style="color:var(--text-muted)"> dop</span>
     <span style="color:var(--danger);font-weight:600" id="sfAlitons">0</span><span style="color:var(--text-muted)"> ali</span>
+    <span style="color:var(--info);font-weight:600" id="sfKamas">0</span><span style="color:var(--text-muted)"> kg</span>
     <span style="color:var(--text-muted);margin-left:4px">| Capia</span>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" integrity="sha384-GJqSu7vueQ9qN0E9yLPb3Wtpd7OrgK8KmYzC8T1IysG1bcvxvIO4qtYR/D3A991F" crossorigin="anonymous"></script>
+  <!-- Info modal -->
+  <div class="info-modal hidden" id="infoModal">
+    <div class="info-content">
+      <h3>Totaux</h3>
+      <div class="info-row"><span>Doplons</span><span id="infoDop">0 / 0</span></div>
+      <div class="info-row"><span>Alitons</span><span id="infoAli">0 / 0</span></div>
+      <div class="info-row"><span>Kamas de Glace</span><span id="infoKg">0 / 0</span></div>
+      <div class="info-row"><span>Recherches</span><span id="infoCount">0 / 0</span></div>
+      <button id="infoClose">Fermer</button>
+    </div>
+  </div>
+
   <script src="js/app.js"></script>
+  <script src="js/tesseract.min.js" defer></script>
 </body>
 </html>
