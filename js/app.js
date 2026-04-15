@@ -611,7 +611,7 @@ document.getElementById('opacitySlider').addEventListener('input', (e) => {
 });
 
 // === UPDATE CHECK ===
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.3.2';
 const GITHUB_REPO = 'Capiia/Wanted-Dofus';
 
 async function checkForUpdate() {
@@ -629,6 +629,8 @@ async function checkForUpdate() {
     if (!setup) return;
 
     document.getElementById('updateBar').classList.remove('hidden');
+    // When update bar is shown, remove header top-padding (titlebar moves to update-bar)
+    document.querySelector('.header').style.paddingTop = '10px';
     document.getElementById('updateText').textContent = `v${latest} disponible !`;
     document.getElementById('updateBtn').addEventListener('click', () => {
       ipcRenderer.send('open-url', setup.browser_download_url);
