@@ -12,12 +12,12 @@ Tracker d'avis de recherche pour Dofus. Inspiré par [Ganymede](https://ganymede
 
 | À récupérer | En cours | Faits |
 |:---:|:---:|:---:|
-| ![À récupérer](https://github.com/Capiia/Wanted-Dofus/releases/download/v1.3.4/tab-recup.png) | ![En cours](https://github.com/Capiia/Wanted-Dofus/releases/download/v1.3.4/tab-encours.png) | ![Faits](https://github.com/Capiia/Wanted-Dofus/releases/download/v1.3.4/tab-faits.png) |
+| ![À récupérer](https://raw.githubusercontent.com/Capiia/Wanted-Dofus/assets/tab-recup.png) | ![En cours](https://raw.githubusercontent.com/Capiia/Wanted-Dofus/assets/tab-encours.png) | ![Faits](https://raw.githubusercontent.com/Capiia/Wanted-Dofus/assets/tab-faits.png) |
 | Liste des recherches disponibles, triées par milice et filtrables | Recherches prises en cours, regroupées par zone | Recherches terminées, conservées pour le suivi |
 
 | Totaux | Recherche multi-onglets |
 |:---:|:---:|
-| ![Modal Info](https://github.com/Capiia/Wanted-Dofus/releases/download/v1.3.4/modal-info.png) | ![Recherche](https://github.com/Capiia/Wanted-Dofus/releases/download/v1.3.4/search.png) |
+| ![Modal Info](https://raw.githubusercontent.com/Capiia/Wanted-Dofus/assets/modal-info.png) | ![Recherche](https://raw.githubusercontent.com/Capiia/Wanted-Dofus/assets/search.png) |
 | Récap des récompenses (doplons, alitons, kamas de glace) restantes et déjà obtenues | La recherche fait remonter les résultats des autres onglets aussi |
 
 ## Installation
