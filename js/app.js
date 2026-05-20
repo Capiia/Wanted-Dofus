@@ -611,19 +611,29 @@ document.getElementById('opacitySlider').addEventListener('input', (e) => {
 });
 
 // === UPDATE CHECK ===
-const APP_VERSION = '1.3.2';
 const GITHUB_REPO = 'Capiia/Wanted-Dofus';
+
+function cmpVersion(a, b) {
+  const pa = a.split('.').map(n => parseInt(n, 10) || 0);
+  const pb = b.split('.').map(n => parseInt(n, 10) || 0);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    if ((pa[i] || 0) > (pb[i] || 0)) return 1;
+    if ((pa[i] || 0) < (pb[i] || 0)) return -1;
+  }
+  return 0;
+}
 
 async function checkForUpdate() {
   // Skip in dev mode
   if (!__dirname.includes('app.asar')) return;
   try {
+    const APP_VERSION = await ipcRenderer.invoke('get-version');
     const resp = await fetch(`https://api.github.com/repos/${GITHUB_REPO}/releases/latest`);
     if (!resp.ok) return;
     const release = await resp.json();
     if (!release.tag_name) return;
-    const latest = release.tag_name.replace('v', '');
-    if (latest === APP_VERSION) return;
+    const latest = release.tag_name.replace(/^v/, '');
+    if (cmpVersion(latest, APP_VERSION) <= 0) return;
 
     const setup = release.assets && release.assets.find(a => a.name.endsWith('.exe'));
     if (!setup) return;

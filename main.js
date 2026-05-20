@@ -73,6 +73,9 @@ app.on('ready', () => {
     if (win) win.setOpacity(val);
   });
 
+  // Version (read from package.json — single source of truth, no more hardcoded mismatches)
+  ipcMain.handle('get-version', () => app.getVersion());
+
   // Storage — atomic write + backup, fallback to backup if main file is missing/empty/corrupt
   ipcMain.handle('load-state', () => readStateFile());
   ipcMain.handle('save-state', (_, data) => {
