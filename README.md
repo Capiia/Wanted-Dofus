@@ -16,7 +16,7 @@ Tracker d'avis de recherche pour Dofus. Inspire par [Ganymede](https://ganymede-
 
 ### Compiler depuis les sources
 
-Si tu prefere builder toi-meme plutot que de lancer un .exe inconnu, c'est encourage. Il te faut [Node.js](https://nodejs.org/) (version LTS recente).
+Si tu préfères builder toi-même plutôt que de lancer un .exe inconnu, c'est encouragé. Il te faut [Node.js](https://nodejs.org/) (version LTS récente).
 
 ```bash
 git clone https://github.com/Capiia/Wanted-Dofus.git
@@ -25,11 +25,11 @@ npm install
 npm run build
 ```
 
-Le setup compile apparait dans `dist/Wanted Setup X.Y.Z.exe`. Tu peux aussi lancer l'app directement sans installer avec `npm start`.
+Le setup compilé apparaît dans `dist/Wanted Setup X.Y.Z.exe`. Tu peux aussi lancer l'app directement sans installer avec `npm start`.
 
-Le code est en JavaScript pur, deux fichiers principaux ([`main.js`](main.js), [`js/app.js`](js/app.js)). Aucune transpilation, aucun bundling : ce que tu lis = ce qui tourne. Pas de telemetrie, pas de serveur tiers en dehors de `dofuspourlesnoobs.com` (guides cliquables) et l'API GitHub (check de mise a jour).
+Le code est en JavaScript pur, deux fichiers principaux ([`main.js`](main.js), [`js/app.js`](js/app.js)). Aucune transpilation, aucun bundling : ce que tu lis = ce qui tourne. Pas de télémétrie, pas de serveur tiers en dehors de `dofuspourlesnoobs.com` (guides cliquables) et l'API GitHub (check de mise à jour).
 
-Note : un rebuild local produit un binaire avec un SHA different du release (timestamps NSIS), donc compare le code source plutot que le binaire.
+Note : un rebuild local produit un binaire avec un SHA différent du release (timestamps NSIS), donc compare le code source plutôt que le binaire.
 
 ## Utilisation
 
