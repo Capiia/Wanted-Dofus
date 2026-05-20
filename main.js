@@ -4,6 +4,35 @@ const fs = require('fs');
 
 let win;
 const storagePath = path.join(app.getPath('userData'), 'state.json');
+const backupPath = storagePath + '.bak';
+const tmpPath = storagePath + '.tmp';
+
+function readStateFile() {
+  try {
+    const raw = fs.readFileSync(storagePath, 'utf-8');
+    if (raw && raw.trim().length > 0) {
+      JSON.parse(raw);
+      return raw;
+    }
+  } catch(e) {}
+  try {
+    const raw = fs.readFileSync(backupPath, 'utf-8');
+    if (raw && raw.trim().length > 0) {
+      JSON.parse(raw);
+      return raw;
+    }
+  } catch(e) {}
+  return null;
+}
+
+function writeStateFile(data) {
+  JSON.parse(data);
+  fs.writeFileSync(tmpPath, data, 'utf-8');
+  const stat = fs.statSync(tmpPath);
+  if (stat.size === 0) throw new Error('tmp write produced empty file');
+  try { if (fs.existsSync(storagePath)) fs.copyFileSync(storagePath, backupPath); } catch(e) {}
+  fs.renameSync(tmpPath, storagePath);
+}
 
 app.on('ready', () => {
   const { width: screenW } = screen.getPrimaryDisplay().workAreaSize;
@@ -44,12 +73,11 @@ app.on('ready', () => {
     if (win) win.setOpacity(val);
   });
 
-  // Storage
-  ipcMain.handle('load-state', () => {
-    try { return fs.readFileSync(storagePath, 'utf-8'); } catch(e) { return null; }
-  });
+  // Storage — atomic write + backup, fallback to backup if main file is missing/empty/corrupt
+  ipcMain.handle('load-state', () => readStateFile());
   ipcMain.handle('save-state', (_, data) => {
-    try { fs.writeFileSync(storagePath, data, 'utf-8'); return true; } catch(e) { return false; }
+    try { writeStateFile(data); return true; }
+    catch(e) { console.error('save-state failed:', e); return false; }
   });
 
   // Clipboard image for OCR
