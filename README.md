@@ -1,18 +1,18 @@
 # Wanted
 
-Tracker d'avis de recherche pour Dofus. Inspire par [Ganymede](https://ganymede-dofus.com).
+Tracker d'avis de recherche pour Dofus. Inspiré par [Ganymede](https://ganymede-dofus.com).
 
 - Suivi des 82 recherches par milice
 - OCR automatique via screenshot
 - Always-on-top (reste par-dessus Dofus)
-- Transparence reglable
+- Transparence réglable
 - Sauvegarde locale persistante
 
 ## Installation
 
-1. Telecharge `Wanted_Setup.exe` depuis les [Releases](../../releases/latest)
+1. Télécharge `Wanted_Setup.exe` depuis les [Releases](../../releases/latest)
 2. Lance-le et suis les instructions
-3. Wanted apparait dans le menu Demarrer et sur le bureau
+3. Wanted apparaît dans le menu Démarrer et sur le bureau
 
 ### Compiler depuis les sources
 
@@ -34,26 +34,26 @@ Note : un rebuild local produit un binaire avec un SHA différent du release (ti
 ## Utilisation
 
 1. Entre ton **Niveau**, **Alignement** et **Ordre**
-2. L'onglet **A recuperer** montre les avis disponibles tries par milice
+2. L'onglet **À récupérer** montre les avis disponibles triés par milice
 3. Clique sur un nom pour ouvrir le guide sur dofuspourlesnoobs.com
 
-### Scanner ses quetes automatiquement
+### Scanner ses quêtes automatiquement
 
-Pour ajouter tes quetes en cours ou terminees sans tout cocher a la main :
+Pour ajouter tes quêtes en cours ou terminées sans tout cocher à la main :
 
 1. Dans Wanted, clique **Scan En cours** ou **Scan Faits** selon ce que tu veux scanner
-2. Dans Dofus, ouvre ton **journal de quetes**
-3. Va dans l'onglet **En cours** pour les quetes prises, ou **Terminees** pour les quetes finies
-4. Fais **Win+Shift+S** et selectionne la zone avec les noms "On recherche..."
+2. Dans Dofus, ouvre ton **journal de quêtes**
+3. Va dans l'onglet **En cours** pour les quêtes prises, ou **Terminées** pour les quêtes finies
+4. Fais **Win+Shift+S** et sélectionne la zone avec les noms "On recherche..."
 5. Reviens sur Wanted et fais **Ctrl+V**
 
-L'OCR detecte automatiquement les noms des recherches et les marque dans l'app.
-Tu peux faire plusieurs screenshots si ta liste ne tient pas en un seul ecran.
+L'OCR détecte automatiquement les noms des recherches et les marque dans l'app.
+Tu peux faire plusieurs screenshots si ta liste ne tient pas en un seul écran.
 
-## Credits
+## Crédits
 
-Inspire par [Ganymede](https://ganymede-dofus.com)
-Donnees extraites de [dofuspourlesnoobs.com](https://www.dofuspourlesnoobs.com/avis-de-recherche.html)
+Inspiré par [Ganymede](https://ganymede-dofus.com)
+Données extraites de [dofuspourlesnoobs.com](https://www.dofuspourlesnoobs.com/avis-de-recherche.html)
 
 by Capia
 
