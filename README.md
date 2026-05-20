@@ -8,6 +8,18 @@ Tracker d'avis de recherche pour Dofus. Inspiré par [Ganymede](https://ganymede
 - Transparence réglable
 - Sauvegarde locale persistante
 
+## Aperçu
+
+| À récupérer | En cours | Faits |
+|:---:|:---:|:---:|
+| ![À récupérer](https://github.com/Capiia/Wanted-Dofus/releases/download/v1.3.4/tab-recup.png) | ![En cours](https://github.com/Capiia/Wanted-Dofus/releases/download/v1.3.4/tab-encours.png) | ![Faits](https://github.com/Capiia/Wanted-Dofus/releases/download/v1.3.4/tab-faits.png) |
+| Liste des recherches disponibles, triées par milice et filtrables | Recherches prises en cours, regroupées par zone | Recherches terminées, conservées pour le suivi |
+
+| Totaux | Recherche multi-onglets |
+|:---:|:---:|
+| ![Modal Info](https://github.com/Capiia/Wanted-Dofus/releases/download/v1.3.4/modal-info.png) | ![Recherche](https://github.com/Capiia/Wanted-Dofus/releases/download/v1.3.4/search.png) |
+| Récap des récompenses (doplons, alitons, kamas de glace) restantes et déjà obtenues | La recherche fait remonter les résultats des autres onglets aussi |
+
 ## Installation
 
 1. Télécharge `Wanted_Setup.exe` depuis les [Releases](../../releases/latest)
