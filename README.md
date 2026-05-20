@@ -29,8 +29,6 @@ Le setup compilé apparaît dans `dist/Wanted Setup X.Y.Z.exe`. Tu peux aussi la
 
 Le code est en JavaScript pur, deux fichiers principaux ([`main.js`](main.js), [`js/app.js`](js/app.js)). Aucune transpilation, aucun bundling : ce que tu lis = ce qui tourne. Pas de télémétrie, pas de serveur tiers en dehors de `dofuspourlesnoobs.com` (guides cliquables) et l'API GitHub (check de mise à jour).
 
-Note : un rebuild local produit un binaire avec un SHA différent du release (timestamps NSIS), donc compare le code source plutôt que le binaire.
-
 ## Utilisation
 
 1. Entre ton **Niveau**, **Alignement** et **Ordre**
